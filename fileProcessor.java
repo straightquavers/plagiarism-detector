@@ -11,33 +11,36 @@ public class fileProcessor {
     // tokenize method
     // put tokens in data structure
 
-    // constructor that takes filedirectory
-    public fileProcessor(String directory) {
-        ArrayList<String> filenames = new ArrayList<String>();
-        //iterate through files
-        filenames = 
+    // constructor that takes file directory
+    public fileProcessor(File directory) {
+        File filenames[] = directory.listFiles();
+        // read other filenames from directory
     }
 
     public static void read(String[] args) {
 
-        // iterate through
-        ArrayList<ArrayList<File>> files = new ArrayList<ArrayList<File>>();
-        // for (int i = 0; i < filenames; i++) {
-        // ArrayList<File> currentFile = new ArrayList<File>();
-        // files.add(currentFile);
-        // }
+        // things to fix
+        // when searching a directory, need to go into a folder, then the src folder, then read all those classes into one file
+        // need to find a way of concatenating files maybe? or maybe an arraylist of files for every source folder even if there's only one file, then when comparing for plagiarism can iterate through all arraylists.
 
-        // use files.get(0) to get at each list
-        // for (int i = 0; i < filenames.length(); i++) {
+        // iterate through
+        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<String> filesAsStrings = new ArrayList<String>();
+        // for (int i = 0; i < filenames; i++) {
         // try {
-        // filename = filenames[i] + ".txt";
-        // File myObj = new File(filename);
-        // Scanner myReader = new Scanner(myObj);
-        // while (myReader.hasNextLine()) {
-        // String data = myReader.nextLine();
-        // System.out.println(data);
+        // extract zip using zipinputstream
+        // String filename = filenames[i].getPath(); 
+        // File currentFile = new File(filename);
+        // strip comments
+        // read file into string
+        // files.add(currentFile);
+        // String currentFileString = new String;
+        // Scanner reader = new Scanner(currentFile);
+        // while (reader.hasNextLine()) {
+        // String currentLine = reader.nextLine();
+        // currentFileString += data;
         // }
-        // myReader.close();
+        // reader.close();
         // } catch (FileNotFoundException e) {
         // System.out.println("An error occurred.");
         // e.printStackTrace();

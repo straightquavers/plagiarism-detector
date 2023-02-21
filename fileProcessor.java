@@ -27,7 +27,7 @@ public class fileProcessor {
         // files.add(currentFile);
         // }
 
-        // use files.get(0) etc to get at each list
+        // use files.get(0) to get at each list
         // for (int i = 0; i < filenames.length(); i++) {
         // try {
         // filename = filenames[i] + ".txt";

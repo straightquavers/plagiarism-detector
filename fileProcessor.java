@@ -13,11 +13,14 @@ public class fileProcessor {
 
     // constructor that takes file directory
     public fileProcessor(File directory) {
-        File filenames[] = directory.listFiles();
         // read other filenames from directory
+        File filenames[] = directory.listFiles();
+        for (int i = 0; i<filenames.length; i++) {
+            System.out.println(filenames[i]);
+        }
     }
 
-    public static void read(String[] args) {
+    public void read() {
 
         // things to fix
         // when searching a directory, need to go into a folder, then the src folder, then read all those classes into one file
@@ -42,7 +45,7 @@ public class fileProcessor {
         // }
         // reader.close();
         // } catch (FileNotFoundException e) {
-        // System.out.println("An error occurred.");
+        // System.out.println("An error occurred. Please restart and enter a valid directory");
         // e.printStackTrace();
         // }
         // }

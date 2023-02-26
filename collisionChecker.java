@@ -4,7 +4,7 @@ public class collisionChecker {
 //
 
     //nlp
-    //- Comments being copied.
+    //- separates comments, checks if being copied.
     // - Checking the whole code through these libraries;
     // - Identifies redundant code added.
     // - Code being split up or merged.

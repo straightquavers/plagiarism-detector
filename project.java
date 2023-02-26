@@ -16,11 +16,12 @@ public class project {
         Scanner s = new Scanner(System.in);
         String directoryName = s.nextLine();
         s.close();
-        System.out.println("Collecting files from directory: " + directoryName);
+        // System.out.println("Collecting zip files from directory: " + directoryName);
+        // String directoryName = "C:\\Users\\phee3\\OneDrive\\Keele\\Keele 22-23\\30014 Dissertation Project\\test";
+        System.out.println("Collecting zip files from directory: " + directoryName);
 
         // setting up file reader
         File directory = new File(directoryName);
-        fileProcessor fp = new fileProcessor(directory);
-        fp.read();
+        fileLoader fl = new fileLoader(directory);
     }
 }

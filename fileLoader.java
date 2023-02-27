@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -17,6 +18,7 @@ public class fileLoader {
     private ArrayList<String> filenames;
     File[] files;
     ArrayList<File> filelist;
+    ArrayList<ArrayList<String>> filesAsStrings;
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -33,6 +35,7 @@ public class fileLoader {
         tempDirectory.mkdirs();
 
         filenames = new ArrayList<String>();
+        filesAsStrings = new ArrayList<ArrayList<String>>();
 
         for (int i = 0; i < tempFilenames.length; i++) {
             if (getExt(tempFilenames[i]).equals("zip")) {
@@ -45,6 +48,11 @@ public class fileLoader {
             readToString(f, tempDirectory);
         }
 
+        for (ArrayList<String> a : filesAsStrings) {
+            for (int i = 0; i<a.size(); i++) {
+                System.out.println(a.get(i));
+            }
+        }
     }
 
     public String getExt(String filepath) {
@@ -65,27 +73,39 @@ public class fileLoader {
             String srcString = directory.getAbsolutePath().replace(".zip", "") + "\\src";
             File currentFile = new File(srcString);
             File[] srcFiles = currentFile.listFiles();
+            ArrayList<String> fileAsString = new ArrayList<String>();
 
                 for (int i = 0; i < srcFiles.length; i++) {
                     if (!srcFiles[i].isDirectory()) {
                         if (getExt(srcFiles[i].getAbsolutePath()).equals("java")) {
                             filelist.add(srcFiles[i]);
+                            Scanner reader = new Scanner(srcFiles[i]);
+                            String currentFileString = "";
+                            while (reader.hasNextLine()) {
+                                String currentLine = reader.nextLine();
+                                currentFileString += currentLine;
+                            }
+                            reader.close();
+                            fileAsString.add(currentFileString);
                         }
                     } else {
                         File currentPackage = new File(srcFiles[i].getName());
                         currentPackage.mkdirs();
                     }
                 }
+
+            filesAsStrings.add(fileAsString);    
             
         } catch (IOException e) {
             System.out.println("An error has occurred. Please try again with a valid directory.");
             e.printStackTrace();
         }
 
-        for (File file : filelist) {
-            System.out.println(file.getName() + ": " + file.getParent());
-        }
-        // directory.delete();
+        // for (File file : filelist) {
+        //     System.out.println(file.getName() + ": " + file.getParent());
+        // }
+
+        filepath.delete();
     }
 
     public void extract(String filepath, String destination) throws IOException {

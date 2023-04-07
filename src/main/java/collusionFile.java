@@ -21,6 +21,14 @@ public class collusionFile {
     ArrayList<Integer> newLines;
     public int blankLines;
 
+    int endOfLineFlag;
+    int startOfLineFlag;
+    int ownLineFlag;
+    ArrayList<Integer> formattingIndices;
+    ArrayList<Integer> endOfLineBracket;
+    ArrayList<Integer> startOfLineBracket;
+    ArrayList<Integer> ownLineBracket;
+
     public collusionFile(String fn, String fas, ArrayList<String> tf, ArrayList<String> tfnk, String cas, ArrayList<String> tc) {
         filename = fn;
         fileAsString = fas;
@@ -34,6 +42,11 @@ public class collusionFile {
         startSpacesIndices = new ArrayList<Integer>();
         newLines = new ArrayList<Integer>();
         fileByLine = new ArrayList<String>();
+
+        formattingIndices = new ArrayList<Integer>();
+        endOfLineBracket = new ArrayList<Integer>();
+        startOfLineBracket = new ArrayList<Integer>();
+        ownLineBracket = new ArrayList<Integer>();
     }
 
 }

@@ -48,7 +48,7 @@ public class collisionChecker {
         tc1 = f.tokenizedComments;
 
         whitespaceCheck(f);
-
+        formattingCheck(f);
     }
 
     public collisionChecker(collusionFile f1, collusionFile f2) {
@@ -77,6 +77,8 @@ public class collisionChecker {
         outputCheck(f1, f2);
         basicCheck(f1, f2);
         substringCheck(f1, f2);
+
+        //flag comparison for each of the whitespace flag arrays and each of the formatting flag arrays
     }
 
     public int getLineNumber(collusionFile f, int charNo) {
@@ -206,9 +208,20 @@ public class collisionChecker {
                 System.out.println(endOfLineBracket.get(i) + ",");
             }
         }
+
+        f.endOfLineFlag = endOfLineFlag;
+        f.startOfLineFlag = startOfLineFlag;
+        f.ownLineFlag = ownLineFlag;
+        f.formattingIndices = formattingIndices;
+        f.endOfLineBracket = endOfLineBracket;
+        f.startOfLineBracket = startOfLineBracket;
+        f.ownLineBracket = ownLineBracket;
     }
 
     public void flagComparison(ArrayList<Integer> flagIndexF1, ArrayList<Integer> flagIndexF2) {
+        ArrayList<ArrayList<Integer>> stringIndices = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> startIndex = new ArrayList<Integer>();
+        ArrayList<Integer> endIndex = new ArrayList<Integer>();
         SimpleTokenizer tokenizer = SimpleTokenizer.INSTANCE;
         for (int i = 0; i < flagIndexF1.size(); i++) {
             for (int j = 0; j < flagIndexF2.size(); j++) {
@@ -227,14 +240,24 @@ public class collisionChecker {
                 int beforeCounter = 0;
                 int counterF1 = tokenAfterString1.length-1;
                 int counterF2 = tokenAfterString2.length-1;
+                boolean keywordFlag = false;
+
+                backTokenLoop:
                 while (counterF1 >= 0 && counterF2 >= 0) {
                     if (tokenAfterString1[counterF1].equals(tokenAfterString2[counterF2])) {
                         beforeCounter++;
+                        keywordFlag = false;
                     }
                     else {
                         for (String keyword: fileLoader.keywords) {
-                            if (keyword.matches(tokenAfterString1[counterF1]) {
-                                
+                            if (keyword.matches(tokenAfterString1[counterF1])) {
+                                if (keywordFlag) {
+                                    //add index to start index
+                                    //fix keyword logic - keywords are not the same as variable names
+                                    //loop needs to break if an unmatching keyword is found, or if multiple unmatching variable names are found
+                                    break backTokenLoop;
+                                }
+                                keywordFlag = true;
                             }
                         }
                     }
@@ -243,11 +266,6 @@ public class collisionChecker {
                 }
             }
         }
-        //check through every whitespace and formatting flag
-        //iterate back through words/tokens (not characters or lines)
-        //if token doesn't match, compare it to tokens in non protected keywords list/protected keywords list
-        //if it isn't protected, check token before to see if it is just a changed variable name
-        //then keep going - if the only things that don't match are variable names, can say variable names have been changed
 
         // (potential to see if variable names changed) - if the differing characters form a substring, compare its similarity to protected keywords
         //if it doesn't match, or if the string contains less than a certain percentage of protected keywords in its length, it could be a variable or text block

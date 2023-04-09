@@ -28,7 +28,7 @@ public class fileLoader {
 
     ArrayList<collusionFile> collusionFiles;
 
-    static String keywords[] = {"abstract", "assert", "args", "boolean", "break", "byte", "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", "if", "implements", "import", "instanceof", "int", "interface", "long", "main", "native", "new", "null", "out", "package", "private", "protected", "public", "print", "println", "return", "short", "static", "strictfp", "String", "super", "switch", "synchronized", "System", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while"};
+    static String keywords[] = {"abstract", "assert", "args", "boolean", "break", "byte", "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", "i", "if", "implements", "import", "instanceof", "int", "interface", "long", "main", "native", "new", "null", "out", "package", "private", "protected", "public", "print", "println", "return", "short", "static", "strictfp", "String", "super", "switch", "synchronized", "System", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while"};
 
     private static final int BUFFER_SIZE = 4096;
 
@@ -74,10 +74,11 @@ public class fileLoader {
         for (ArrayList<String> a : tokenizedFiles) {
             ArrayList<String> noKeywords = new ArrayList<String>();
             for (String t : a) {
-                if (!isKeyword(t)) {
+                if (!isKeyword(t) && !noKeywords.contains(t)) {
                     noKeywords.add(t);
                 }
             }
+
             tokenFilesNoKeywords.add(noKeywords);
         }
 
@@ -86,10 +87,10 @@ public class fileLoader {
             System.out.println(filenames.get(i));
         }
 
-        System.out.println("\n\nHere are the files as strings:");
-        for (int i = 0; i < filesAsStrings.size(); i++) {
-            System.out.println("\n" + filenames.get(i) + ":\n" + filesAsStrings.get(i) + "\n///////////////////////////////////////////////");
-        }
+//        System.out.println("\n\nHere are the files as strings:");
+//        for (int i = 0; i < filesAsStrings.size(); i++) {
+//            System.out.println("\n" + filenames.get(i) + ":\n" + filesAsStrings.get(i) + "\n///////////////////////////////////////////////");
+//        }
 
         System.out.println("\nHere are the comments as strings:");
         for (int i = 0; i < commentsAsStrings.size(); i++) {

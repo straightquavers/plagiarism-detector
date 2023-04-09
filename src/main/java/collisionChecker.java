@@ -78,7 +78,6 @@ public class collisionChecker {
         basicCheck(f1, f2);
         substringCheck(f1, f2);
 
-        //flag comparison for each of the whitespace flag arrays and each of the formatting flag arrays
     }
 
     public int getLineNumber(collusionFile f, int charNo) {
@@ -219,9 +218,14 @@ public class collisionChecker {
     }
 
     public void flagComparison(ArrayList<Integer> flagIndexF1, ArrayList<Integer> flagIndexF2) {
-        ArrayList<ArrayList<Integer>> stringIndices = new ArrayList<ArrayList<Integer>>();
-        ArrayList<Integer> startIndex = new ArrayList<Integer>();
-        ArrayList<Integer> endIndex = new ArrayList<Integer>();
+        ArrayList<ArrayList<Integer>> stringIndices1 = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> startIndex1 = new ArrayList<Integer>();
+        ArrayList<Integer> endIndex1 = new ArrayList<Integer>();
+
+        ArrayList<ArrayList<Integer>> stringIndices2 = new ArrayList<ArrayList<Integer>>();
+        ArrayList<Integer> startIndex2 = new ArrayList<Integer>();
+        ArrayList<Integer> endIndex2 = new ArrayList<Integer>();
+
         SimpleTokenizer tokenizer = SimpleTokenizer.INSTANCE;
         for (int i = 0; i < flagIndexF1.size(); i++) {
             for (int j = 0; j < flagIndexF2.size(); j++) {
@@ -238,38 +242,90 @@ public class collisionChecker {
 
                 //iterate backwards through tokenbefore arrays, until find one that doesn't match
                 int beforeCounter = 0;
-                int counterF1 = tokenAfterString1.length-1;
-                int counterF2 = tokenAfterString2.length-1;
-                boolean keywordFlag = false;
+                int beforeCharCounter1 = 1;
+                int beforeCharCounter2 = 1;
+                int beforeCounterF1 = tokenBeforeString1.length-1;
+                int beforeCounterF2 = tokenBeforeString2.length-1;
+                boolean beforeKeywordFlag = false;
+
+                int afterCounter = 0;
+                int afterCharCounter1 = 1;
+                int afterCharCounter2 = 1;
+                int afterCounterF1 = tokenBeforeString1.length-1;
+                int afterCounterF2 = tokenBeforeString2.length-1;
+                boolean afterKeywordFlag = false;
 
                 backTokenLoop:
-                while (counterF1 >= 0 && counterF2 >= 0) {
-                    if (tokenAfterString1[counterF1].equals(tokenAfterString2[counterF2])) {
+                while (beforeCounterF1 >= 0 && beforeCounterF2 >= 0) {
+                    if (tokenBeforeString1[beforeCounterF1].equals(tokenBeforeString2[beforeCounterF2])) {
                         beforeCounter++;
-                        keywordFlag = false;
+                        beforeKeywordFlag = false;
                     }
                     else {
                         for (String keyword: fileLoader.keywords) {
-                            if (keyword.matches(tokenAfterString1[counterF1])) {
-                                if (keywordFlag) {
-                                    //add index to start index
-                                    //fix keyword logic - keywords are not the same as variable names
-                                    //loop needs to break if an unmatching keyword is found, or if multiple unmatching variable names are found
+                            if (!keyword.matches(tokenBeforeString1[beforeCounterF1])) {
+                                if (beforeKeywordFlag) {
+                                    beforeCharCounter1 += tokenBeforeString1[beforeCounterF1].length() + 1;
+                                    beforeCharCounter2 += tokenBeforeString2[beforeCounterF2].length() + 1;
+                                    int charIndex1 = flagIndexF1.get(i) - beforeCharCounter1;
+                                    int charIndex2 = flagIndexF2.get(j) - beforeCharCounter2;
+                                    startIndex1.add(charIndex1);
+                                    startIndex2.add(charIndex2);
                                     break backTokenLoop;
                                 }
-                                keywordFlag = true;
+                                beforeKeywordFlag = true;
+                            }
+                            else {
+                                int charIndex1 = flagIndexF1.get(i) - beforeCharCounter1;
+                                int charIndex2 = flagIndexF2.get(j) - beforeCharCounter2;
+                                startIndex1.add(charIndex1);
+                                startIndex2.add(charIndex2);
+                                break backTokenLoop;
                             }
                         }
                     }
-                    counterF1--;
-                    counterF2--;
+                    beforeCharCounter1 += tokenBeforeString1[beforeCounterF1].length() + 1;
+                    beforeCharCounter2 += tokenBeforeString2[beforeCounterF2].length() + 1;
+                    beforeCounterF1--;
+                    beforeCounterF2--;
+                }
+
+                afterTokenLoop:
+                while (afterCounterF1 >= 0 && afterCounterF2 >= 0) {
+                    if (tokenAfterString1[afterCounterF1].equals(tokenAfterString2[afterCounterF2])) {
+                        afterCounter++;
+                        afterKeywordFlag = false;
+                    }
+                    else {
+                        for (String keyword: fileLoader.keywords) {
+                            if (!keyword.matches(tokenAfterString1[afterCounterF1])) {
+                                if (afterKeywordFlag) {
+                                    afterCharCounter1 += tokenAfterString1[afterCounterF1].length() + 1;
+                                    afterCharCounter2 += tokenAfterString2[afterCounterF2].length() + 1;
+                                    int charIndex1 = flagIndexF1.get(i) - afterCharCounter1;
+                                    int charIndex2 = flagIndexF2.get(j) - afterCharCounter2;
+                                    startIndex1.add(charIndex1);
+                                    startIndex2.add(charIndex2);
+                                    break afterTokenLoop;
+                                }
+                                afterKeywordFlag = true;
+                            }
+                            else {
+                                int charIndex1 = flagIndexF1.get(i) - afterCharCounter1;
+                                int charIndex2 = flagIndexF2.get(j) - afterCharCounter2;
+                                startIndex1.add(charIndex1);
+                                startIndex2.add(charIndex2);
+                                break afterTokenLoop;
+                            }
+                        }
+                    }
+                    afterCharCounter1 += tokenAfterString1[afterCounterF1].length() + 1;
+                    afterCharCounter2 += tokenAfterString2[afterCounterF2].length() + 1;
+                    afterCounterF1--;
+                    afterCounterF2--;
                 }
             }
         }
-
-        // (potential to see if variable names changed) - if the differing characters form a substring, compare its similarity to protected keywords
-        //if it doesn't match, or if the string contains less than a certain percentage of protected keywords in its length, it could be a variable or text block
-        //to translate - find string of non-matching characters in line with high similarity, compare to list of protected keywords, if no matches, and if next characters are ( or {, flag as potentially changed variable name
     }
 
     public void basicCheck(collusionFile f1, collusionFile f2) {
@@ -288,31 +344,55 @@ public class collisionChecker {
         System.out.println("Distance between comments as strings: " + l.apply(cas1, cas2));
         System.out.println("Comments as string similarity: " + String.format("%.1f", commentSimilarity) + "%");
 
+        int tokenCounter = 0;
         for (String token1 : tfnk1) {
             for (String token2 : tfnk2) {
                 double similarity = percentageScore(token1, token2, l.apply(token1, token2));
                 if (similarity > 80) {
-                    System.out.println("Similar token identified at " + String.format("%.1f", similarity) + "% similarity, tokens are: " + token1 + " (line " + getLineNumber(f1, fas1.indexOf(token1)) + " of " + fn1 + ") and " + token2 + " (line " + getLineNumber(f2, fas2.indexOf(token2)) + " of file " + fn2 + ")");
+                    tokenCounter++;
+//                    System.out.println("Similar token identified at " + String.format("%.1f", similarity) + "% similarity, tokens are: " + token1 + " (line " + getLineNumber(f1, fas1.indexOf(token1)) + " of " + fn1 + ") and " + token2 + " (line " + getLineNumber(f2, fas2.indexOf(token2)) + " of file " + fn2 + ")");
                 }
             }
         }
+        if (tokenCounter > tfnk1.size()/2) {
+            System.out.println("More than half the tokens have >80% similarity to the other file");
+        }
+        if (tokenCounter > tfnk2.size()/2) {
+            System.out.println("More than half the tokens have >80% similarity to the other file");
+        }
 
+        int commentTokenCounter = 0;
         for (String token1 : tc1) {
             for (String token2 : tc2) {
                 double similarity = percentageScore(token1, token2, l.apply(token1, token2));
                 if (similarity > 80) {
-                    System.out.println("Similar comment token identified at " + String.format("%.1f", similarity) + "% similarity, tokens are: " + token1 + " (line " + getLineNumber(f1, fas1.indexOf(token1)) + " of " + fn1 + ") and " + token2 + " (line " + getLineNumber(f2, fas2.indexOf(token2)) + " of file " + fn2 + ")");
+                    commentTokenCounter++;
+//                    System.out.println("Similar comment token identified at " + String.format("%.1f", similarity) + "% similarity, tokens are: " + token1 + " (line " + getLineNumber(f1, fas1.indexOf(token1)) + " of " + fn1 + ") and " + token2 + " (line " + getLineNumber(f2, fas2.indexOf(token2)) + " of file " + fn2 + ")");
                 }
             }
         }
+        if (commentTokenCounter > tc1.size()/2) {
+            System.out.println("More than half the comment tokens have >80% similarity to the other file");
+        }
+        if (commentTokenCounter > tc2.size()/2) {
+            System.out.println("More than half the comment tokens have >80% similarity to the other file");
+        }
 
+        int fileByLineCounter = 0;
         for (int i = 0; i < f1.fileByLine.size(); i++) {
             for (int j = 0; j < f2.fileByLine.size(); j++) {
                 double stringSimilarity = percentageScore(f1.fileByLine.get(i), f2.fileByLine.get(j), l.apply(f1.fileByLine.get(i), f2.fileByLine.get(j)));
-                if (stringSimilarity > 50) {
-                    System.out.println(String.format("%.1f", stringSimilarity) + "% line similarity found in file " + f1.filename + " at line " + i + ", and file " + f2.filename + " at line " + j + " (can print line here)");
+                if (stringSimilarity > 80) {
+                    fileByLineCounter++;
+//                    System.out.println(String.format("%.1f", stringSimilarity) + "% line similarity found in file " + f1.filename + " at line " + i + ", and file " + f2.filename + " at line " + j + " (can print line here)");
                 }
             }
+        }
+        if (fileByLineCounter > f1.newLines.size()/2) {
+            System.out.println("More than half of the lines in " + f1.filename + " are copied.");
+        }
+        if (fileByLineCounter > f2.newLines.size()/2) {
+            System.out.println("More than half of the lines in " + f2.filename + " are copied.");
         }
     }
 
@@ -324,7 +404,10 @@ public class collisionChecker {
         int indexF1 = f1.fileAsString.indexOf(subsequence);
         int indexF2 = f2.fileAsString.indexOf(subsequence);
 
-        if (PCofF1 > 20 || PCofF2 > 20) {
+        if (PCofF1 > 20) {
+            System.out.println("Long subsequence found in file " + f1.filename + " at line " + getLineNumber(f1, indexF1) + " (" + String.format("%.1f", PCofF1) + "% of file length) and in file " + f2.filename + " at line " + getLineNumber(f2, indexF2) + " (" + String.format("%.1f", PCofF2) + "% of file length)");
+        }
+        if (PCofF2 > 20) {
             System.out.println("Long subsequence found in file " + f1.filename + " at line " + getLineNumber(f1, indexF1) + " (" + String.format("%.1f", PCofF1) + "% of file length) and in file " + f2.filename + " at line " + getLineNumber(f2, indexF2) + " (" + String.format("%.1f", PCofF2) + "% of file length)");
         }
     }

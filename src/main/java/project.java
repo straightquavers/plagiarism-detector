@@ -19,11 +19,11 @@ public class project {
         Scanner s = new Scanner(System.in);
         String directoryName = s.nextLine();
 
-        System.out.println("Please enter any code to not be included in the comparison: ");
+        System.out.println("Please enter any code to not be included in the comparison, or press enter to continue: ");
         String givenCode = s.nextLine();
         s.close();
         // System.out.println("Collecting zip files from directory: " + directoryName);
-        System.out.println("\nCollecting zip files from directory: " + directoryName);
+        System.out.println("\n\nCollecting zip files from directory: " + directoryName);
 
         // setting up file reader
         File directory = new File(directoryName);

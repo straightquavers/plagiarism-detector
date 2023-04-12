@@ -211,11 +211,13 @@ public class fileLoader {
             }
 
             int givenCodeIndex = fileAsString.indexOf(givenCode);
-            while (givenCodeIndex >= 0) {
-                String file1 = fileAsString.substring(0, givenCodeIndex);
-                String file2 = fileAsString.substring(givenCodeIndex + givenCode.length());
-                fileAsString = file1 + file2;
-                givenCodeIndex = fileAsString.indexOf(givenCode);
+            if (!givenCode.isBlank()) {
+                while (givenCodeIndex >= 0) {
+                    String file1 = fileAsString.substring(0, givenCodeIndex);
+                    String file2 = fileAsString.substring(givenCodeIndex + givenCode.length());
+                    fileAsString = file1 + file2;
+                    givenCodeIndex = fileAsString.indexOf(givenCode);
+                }
             }
 
             filesAsStrings.add(fileAsString);

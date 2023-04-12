@@ -25,15 +25,14 @@ public class fileLoader {
     ArrayList<ArrayList<String>> tokenFilesNoKeywords;
     ArrayList<String> commentsAsStrings;
     ArrayList<ArrayList<String>> tokenizedComments;
-
+    String givenCode;
     ArrayList<collusionFile> collusionFiles;
 
     static String keywords[] = {"abstract", "assert", "args", "boolean", "break", "byte", "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "extends", "false", "final", "finally", "float", "for", "i", "if", "implements", "import", "instanceof", "int", "interface", "long", "main", "native", "new", "null", "out", "package", "private", "protected", "public", "print", "println", "return", "short", "static", "strictfp", "String", "super", "switch", "synchronized", "System", "this", "throw", "throws", "transient", "true", "try", "void", "volatile", "while"};
 
-    private static final int BUFFER_SIZE = 4096;
-
     // constructor that takes file directory
-    public fileLoader(File d) {
+    public fileLoader(File d, String _givenCode) {
+        givenCode = _givenCode;
         collusionFiles = new ArrayList<collusionFile>();
         // read other zip filenames from directory
         directory = d;
@@ -73,16 +72,25 @@ public class fileLoader {
 
         for (ArrayList<String> a : tokenizedFiles) {
             ArrayList<String> noKeywords = new ArrayList<String>();
+            boolean dotFlag = false;
+            keywordLoop:
             for (String t : a) {
-                if (!isKeyword(t) && !noKeywords.contains(t)) {
+                if (!isKeyword(t) && !noKeywords.contains(t) && !Character.isDigit(t.charAt(0))) {
+                    if (dotFlag) {
+                        dotFlag = false;
+                        continue keywordLoop;
+                    }
                     noKeywords.add(t);
+                }
+                if (t.charAt(0) == '.') {
+                    dotFlag = true;
                 }
             }
 
             tokenFilesNoKeywords.add(noKeywords);
         }
 
-        System.out.println("\n\nHere are the filenames:");
+        System.out.println(filenames.size() + " files found." + "\n\nHere are the filenames:");
         for (int i = 0; i < filenames.size(); i++) {
             System.out.println(filenames.get(i));
         }
@@ -91,26 +99,26 @@ public class fileLoader {
 //        for (int i = 0; i < filesAsStrings.size(); i++) {
 //            System.out.println("\n" + filenames.get(i) + ":\n" + filesAsStrings.get(i) + "\n///////////////////////////////////////////////");
 //        }
-
-        System.out.println("\nHere are the comments as strings:");
-        for (int i = 0; i < commentsAsStrings.size(); i++) {
-            System.out.println(commentsAsStrings.get(i));
-        }
-
-        System.out.println("\n\nHere are the tokenized files:");
-        for (int i = 0; i < tokenizedFiles.size(); i++) {
-            System.out.println(tokenizedFiles.get(i));
-        }
-
-        System.out.println("\n\nHere are the tokenized comments:");
-        for (int i = 0; i < tokenizedComments.size(); i++) {
-            System.out.println(tokenizedComments.get(i));
-        }
-
-        System.out.println("\n\nHere are the tokenized files, with no comments, keywords, or punctuation:");
-        for (int i = 0; i < tokenFilesNoKeywords.size(); i++) {
-            System.out.println(tokenFilesNoKeywords.get(i));
-        }
+//
+//        System.out.println("\nHere are the comments as strings:");
+//        for (int i = 0; i < commentsAsStrings.size(); i++) {
+//            System.out.println(commentsAsStrings.get(i));
+//        }
+//
+//        System.out.println("\n\nHere are the tokenized files:");
+//        for (int i = 0; i < tokenizedFiles.size(); i++) {
+//            System.out.println(tokenizedFiles.get(i));
+//        }
+//
+//        System.out.println("\n\nHere are the tokenized comments:");
+//        for (int i = 0; i < tokenizedComments.size(); i++) {
+//            System.out.println(tokenizedComments.get(i));
+//        }
+//
+//        System.out.println("\n\nHere are the tokenized files, with no comments, keywords, or punctuation:");
+//        for (int i = 0; i < tokenFilesNoKeywords.size(); i++) {
+//            System.out.println(tokenFilesNoKeywords.get(i));
+//        }
 
         for (int i = 0; i < filenames.size(); i++) {
             collusionFiles.add(new collusionFile(filenames.get(i), filesAsStrings.get(i), tokenizedFiles.get(i), tokenFilesNoKeywords.get(i), commentsAsStrings.get(i), tokenizedComments.get(i)));
@@ -202,6 +210,14 @@ public class fileLoader {
                 }
             }
 
+            int givenCodeIndex = fileAsString.indexOf(givenCode);
+            while (givenCodeIndex >= 0) {
+                String file1 = fileAsString.substring(0, givenCodeIndex);
+                String file2 = fileAsString.substring(givenCodeIndex + givenCode.length());
+                fileAsString = file1 + file2;
+                givenCodeIndex = fileAsString.indexOf(givenCode);
+            }
+
             filesAsStrings.add(fileAsString);
             commentsAsStrings.add(commentAsString);
 
@@ -214,27 +230,27 @@ public class fileLoader {
     }
 
     public void extract(String filepath, String destination) throws IOException {
-        ZipInputStream zi = new ZipInputStream(new FileInputStream(filepath));
-        ZipEntry ze = zi.getNextEntry();
-        while (ze != null) {
-            String newFilepath = destination + "\\" + ze.getName();
-            if (!ze.isDirectory()) {
+        ZipInputStream zipInput = new ZipInputStream(new FileInputStream(filepath));
+        ZipEntry zipEntry = zipInput.getNextEntry();
+        while (zipEntry != null) {
+            String newFilepath = destination + "\\" + zipEntry.getName();
+            if (!zipEntry.isDirectory()) {
                 // only if files are java and in source
                 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFilepath));
-                byte[] bytesIn = new byte[BUFFER_SIZE];
-                int read = 0;
-                while ((read = zi.read(bytesIn)) != -1) {
-                    bos.write(bytesIn, 0, read);
+                byte[] buffer = new byte[1024];
+                int readIn = 0;
+                while ((readIn = zipInput.read(buffer)) != -1) {
+                    bos.write(buffer, 0, readIn);
                 }
                 bos.close();
             } else {
                 File newDirectory = new File(newFilepath);
                 newDirectory.mkdirs();
             }
-            zi.closeEntry();
-            ze = zi.getNextEntry();
+            zipInput.closeEntry();
+            zipEntry = zipInput.getNextEntry();
         }
-        zi.close();
+        zipInput.close();
 
         // delete files that aren't src or java
     }

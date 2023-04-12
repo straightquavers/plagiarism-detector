@@ -28,6 +28,7 @@ public class collusionFile {
     ArrayList<Integer> endOfLineBracket;
     ArrayList<Integer> startOfLineBracket;
     ArrayList<Integer> ownLineBracket;
+    String formattingIndicator;
 
     public collusionFile(String fn, String fas, ArrayList<String> tf, ArrayList<String> tfnk, String cas, ArrayList<String> tc) {
         filename = fn;
@@ -47,6 +48,7 @@ public class collusionFile {
         endOfLineBracket = new ArrayList<Integer>();
         startOfLineBracket = new ArrayList<Integer>();
         ownLineBracket = new ArrayList<Integer>();
+        formattingIndicator = "";
     }
 
 }

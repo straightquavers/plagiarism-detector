@@ -310,10 +310,10 @@ public class collisionChecker {
                 }
                 ArrayList<Integer> tempIndices1 = new ArrayList<>();
                 ArrayList<Integer> tempIndices2 = new ArrayList<>();
-                tempIndices1.add(i);
-                tempIndices1.add(j);
-                tempIndices2.add(j);
-                tempIndices2.add(i);
+                tempIndices1.add(flagIndexF1.get(i));
+                tempIndices1.add(flagIndexF2.get(j));
+                tempIndices2.add(flagIndexF2.get(j));
+                tempIndices2.add(flagIndexF1.get(i));
 
                 String beforeString1 = fas1.substring(0, flagIndexF1.get(i));
                 String beforeString2 = fas2.substring(0, flagIndexF2.get(j));

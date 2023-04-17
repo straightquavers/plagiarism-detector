@@ -20,6 +20,16 @@ public class scoreCalculator {
     double outputSimilarity;
     double substringSimilarity;
     double finalScore;
+    ArrayList<ArrayList<ArrayList<Integer>>> blankLineResults;
+
+    ArrayList<ArrayList<ArrayList<Integer>>> startSpacesResults;
+
+    ArrayList<ArrayList<ArrayList<Integer>>> endSpacesResults;
+
+    ArrayList<ArrayList<ArrayList<Integer>>> startBracketsResults;
+    ArrayList<ArrayList<ArrayList<Integer>>> endBracketResults;
+    ArrayList<ArrayList<ArrayList<Integer>>> ownBracketResults;
+
     //stores tolerances
     //calculates final percentage for file
     //takes numbers from collision checker and calculates score
@@ -56,14 +66,22 @@ public class scoreCalculator {
         endBracketResultsScore = cc.endBracketResultsScore * 0.003;
         ownBracketResultsScore = cc.ownBracketResultsScore * 0.003;
 
-        fasSimilarity = cc.fasSimilarity * 0.4;
-        commentSimilarity = cc.commentSimilarity * 0.4;
+        fasSimilarity = cc.fasSimilarity * 0.45;
+        commentSimilarity = cc.commentSimilarity * 0.45;
 
         tokenSimilarity = cc.tokenScore * 0.1;
         commentTokenSimilarity = cc.commentTokenScore * 0.1;
 
-        outputSimilarity = cc.similarityPC * 0.2;
-        substringSimilarity = cc.substringScore * 0.2;
+        outputSimilarity = cc.similarityPC * 0.25;
+        substringSimilarity = cc.substringScore * 0.25;
+
+        blankLineResults = cc.blankLineResults;
+        startSpacesResults = cc.startSpacesResults;
+        endSpacesResults = cc.endSpacesResults;
+
+        startBracketsResults = cc.startBracketsResults;
+        endBracketResults = cc.endBracketResults;
+        ownBracketResults = cc.ownBracketResults;
 
 
         finalScore = 80*(blankLineResultsScore + startSpacesResultsScore + endSpacesResultsScore + startBracketsResultsScore + endBracketResultsScore + ownBracketResultsScore + fasSimilarity + commentSimilarity + tokenSimilarity + commentTokenSimilarity + outputSimilarity + substringSimilarity);
@@ -84,9 +102,38 @@ public class scoreCalculator {
         return finalScore;
     }
 
-    public String getNames() {
-        String names = f1.filename + " & " + f2.filename;
+    public ArrayList<String> getNames() {
+        ArrayList<String> names = new ArrayList<>();
+        String nameString = f1.filename + " & " + f2.filename;
+        names.add(f1.filename);
+        names.add(f2.filename);
+        names.add(nameString);
         return names;
+    }
+
+    public ArrayList<ArrayList<ArrayList<ArrayList<Integer>>>> getIndices() {
+        ArrayList<ArrayList<ArrayList<ArrayList<Integer>>>> resultsIndices = new ArrayList<ArrayList<ArrayList<ArrayList<Integer>>>>();
+
+        //strings indices file 1, file 2 ->
+        // list of all flags ->
+        // flag index f1, flag index f2, start index f1, end index f1
+
+        resultsIndices.add(blankLineResults);
+        resultsIndices.add(startSpacesResults);
+        resultsIndices.add(endSpacesResults);
+        resultsIndices.add(startBracketsResults);
+        resultsIndices.add(endBracketResults);
+        resultsIndices.add(ownBracketResults);
+        return resultsIndices;
+    }
+
+    public int getLineNumber(collusionFile f, int charNo) {
+        for (int i = 0; i < f.newLines.size(); i++) {
+            if (charNo <= f.newLines.get(i)) {
+                return i;
+            }
+        }
+        return f.newLines.size();
     }
 
     //longest common subsequence - adds similarity for the percentage of the length of the file that the subsequence takes up

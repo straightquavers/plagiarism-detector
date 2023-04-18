@@ -15,13 +15,13 @@ public class project {
     public static void main(String[] args) {
 
         // getting directory name
-        System.out.println("///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////" +
+        System.out.println("////////////////////////////////////////////////////////////////////////////////////////////////////////////////" +
                 "\nThis program identifies potential plagiarism in Java source code, from user-submitted zipped folders containing Java classes." +
                 "\nTo use the program, please enter a directory name when prompted. Only zipped folders will be identified by the program." +
                 "\nFolders with multiple Java classes and other folders can be used, as long as the following structure is included: internal folder named 'src' -> Java class(es)." +
                 "\nThen, provide any Java code to be excluded from the detection process (such as code provided as part of a programming assignment)." +
-                "\nThe program will output the 10 files with highest plagiarism scores, and create a text file in the provided directory with more detailed information." +
-                "\n///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////" +
+                "\nThe program will output the files with highest plagiarism scores above 50% (maximum 10 files displayed), and create a text file in the provided directory with more detailed information." +
+                "////////////////////////////////////////////////////////////////////////////////////////////////////////////////" +
                 "\n\nPlease enter a directory: ");
         Scanner s = new Scanner(System.in);
         String directoryName = s.nextLine();

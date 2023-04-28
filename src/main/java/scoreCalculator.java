@@ -46,7 +46,7 @@ public class scoreCalculator {
 //                - Output printlns
 
     public scoreCalculator(collusionFile _f1, collusionFile _f2) {
-        collisionChecker cc = new collisionChecker(_f1, _f2);
+        collusionChecker cc = new collusionChecker(_f1, _f2);
 
         f1 = _f1;
         f2 = _f2;
@@ -59,12 +59,12 @@ public class scoreCalculator {
             usernameMatch = 0;
         }
 
-        blankLineResultsScore = cc.blankLineResultsScore * 0.003;
-        startSpacesResultsScore = cc.startSpacesResultsScore * 0.003;
-        endSpacesResultsScore = cc.endSpacesResultsScore * 0.001;
-        startBracketsResultsScore = cc.startBracketsResultsScore * 0.003;
-        endBracketResultsScore = cc.endBracketResultsScore * 0.003;
-        ownBracketResultsScore = cc.ownBracketResultsScore * 0.003;
+        blankLineResultsScore = cc.blankLineResultsScore * 0.1;
+        startSpacesResultsScore = cc.startSpacesResultsScore * 0.1;
+        endSpacesResultsScore = cc.endSpacesResultsScore * 0.05;
+        startBracketsResultsScore = cc.startBracketsResultsScore * 0.1;
+        endBracketResultsScore = cc.endBracketResultsScore * 0.1;
+        ownBracketResultsScore = cc.ownBracketResultsScore * 0.1;
 
         fasSimilarity = cc.fasSimilarity * 0.45;
         commentSimilarity = cc.commentSimilarity * 0.45;

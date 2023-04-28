@@ -165,7 +165,6 @@ public class fileLoader {
                         Scanner reader = new Scanner(srcFiles[i]);
                         String currentFileString = "";
                         String currentCommentString = "";
-//                        boolean commentLineFlag = false;
                         while (reader.hasNextLine()) {
                             lineHasComment = false;
                             lineHasMultiComment = false;
@@ -185,18 +184,11 @@ public class fileLoader {
                                 }
                             }
                             if (lineHasComment) {
-//                                if (!commentLineFlag && currentFileString.charAt(currentFileString.length() - 1) == '\n') {
-//                                    currentFileString += "\n";
-//                                    commentLineFlag = true;
-//                                } else {
-//                                    commentLineFlag = false;
-//                                }
                                 currentLine = currentLine.split("/")[0].stripTrailing();
                             } else if (lineHasMultiComment) {
                                 currentLine = "";
                             } else {
                                 currentFileString += "\n";
-//                                commentLineFlag = false;
                             }
                             currentFileString += currentLine;
                         }

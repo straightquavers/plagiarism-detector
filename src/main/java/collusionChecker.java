@@ -2,12 +2,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.commons.text.similarity.LongestCommonSubsequence;
-import opennlp.tools.tokenize.SimpleTokenizer;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
-public class collisionChecker {
+public class collusionChecker {
     double substringScore;
     double fileByLineScore;
     double similarityPC;
@@ -59,7 +58,7 @@ public class collisionChecker {
     int tokenCounter;
     int commentTokenCounter;
 
-    public collisionChecker(collusionFile f) {
+    public collusionChecker(collusionFile f) {
         //constructor for identifying flags that dont need comparing
         fn1 = f.filename;
         fas1 = f.fileAsString;
@@ -72,7 +71,7 @@ public class collisionChecker {
         formattingCheck(f);
     }
 
-    public collisionChecker(collusionFile f1, collusionFile f2) {
+    public collusionChecker(collusionFile f1, collusionFile f2) {
         //overloaded constructor for comparison
         fn1 = f1.filename;
         fas1 = f1.fileAsString;
@@ -132,10 +131,8 @@ public class collisionChecker {
             int stringLength = 0;
             int numberOfStrings = results.get(i).size();
             for (int j = 0; j < numberOfStrings; j++) {
-                // remove matching from arrays - if arraylist.get(1) == j
-                stringLength += results.get(i).get(j).get(2) + results.get(i).get(j).get(3);
+                stringLength += results.get(i).get(j).get(3) - results.get(i).get(j).get(2);
             }
-            collusionFile file;
             if (i == 0) {
                 score1 = stringLength/(double)f1.fileAsString.length();
             }
@@ -144,10 +141,7 @@ public class collisionChecker {
             }
             score = max(score1,score2);
         }
-
-//        System.out.println(score);
         return score;
-
     }
 
     public int getLineNumber(collusionFile f, int charNo) {
@@ -540,18 +534,10 @@ public class collisionChecker {
     public void basicCheck(collusionFile f1, collusionFile f2) {
         if (f1.filename.matches(f2.filename)) {
             usernameMatch = true;
-//            System.out.println("Filenames match - author " + f1.filename + " has the same student number as author " + f2.filename);
-        } else {
-//            System.out.println("Filenames do not match");
         }
 
         fasSimilarity = percentageScore(fas1, fas2, l.apply(fas1, fas2));
-//        System.out.println("Distance between files as strings: " + l.apply(fas1, fas2));
-//        System.out.println("File as string similarity: " + String.format("%.1f", fasSimilarity) + "%");
-
         commentSimilarity = percentageScore(cas1, cas2, l.apply(cas1, cas2));
-//        System.out.println("Distance between comments as strings: " + l.apply(cas1, cas2));
-//        System.out.println("Comments as string similarity: " + String.format("%.1f", commentSimilarity) + "%");
 
         tokenCounter = 0;
         for (String token1 : tfnk1) {
@@ -559,18 +545,10 @@ public class collisionChecker {
                 double similarity = percentageScore(token1, token2, l.apply(token1, token2));
                 if (similarity > 80) {
                     tokenCounter++;
-//                    System.out.println("Similar token identified at " + String.format("%.1f", similarity) + "% similarity, tokens are: " + token1 + " (line " + getLineNumber(f1, fas1.indexOf(token1)) + " of " + fn1 + ") and " + token2 + " (line " + getLineNumber(f2, fas2.indexOf(token2)) + " of file " + fn2 + ")");
                 }
             }
         }
         tokenScore = ((tokenCounter/ (double)tfnk1.size()) + (tokenCounter/ (double)tfnk2.size()));
-
-        if (tokenCounter > tfnk1.size() / 2) {
-//            System.out.println("More than half the tokens have >80% similarity to the other file");
-        }
-        if (tokenCounter > tfnk2.size() / 2) {
-//            System.out.println("More than half the tokens have >80% similarity to the other file");
-        }
 
         commentTokenCounter = 0;
         for (String token1 : tc1) {
@@ -593,22 +571,15 @@ public class collisionChecker {
         int fileByLineCounter = 0;
         for (int i = 0; i < f1.fileByLine.size(); i++) {
             for (int j = 0; j < f2.fileByLine.size(); j++) {
-                double stringSimilarity = percentageScore(f1.fileByLine.get(i), f2.fileByLine.get(j), l.apply(f1.fileByLine.get(i), f2.fileByLine.get(j)));
-                if (stringSimilarity > 70) {
+                double stringSimilarity = percentageScore(f1.fileByLine.get(i), f2.fileByLine.get(j),
+                        l.apply(f1.fileByLine.get(i), f2.fileByLine.get(j)));
+                if (stringSimilarity > 0.7) {
                     fileByLineCounter++;
-//                    System.out.println(String.format("%.1f", stringSimilarity) + "% line similarity found in file " + f1.filename + " at line " + i + ", and file " + f2.filename + " at line " + j + " (can print line here)");
                 }
             }
         }
 
         fileByLineScore = ((fileByLineCounter/ (double)f1.newLines.size()) + (fileByLineCounter/ (double)f2.newLines.size()));
-
-        if (fileByLineCounter > f1.newLines.size() / 2) {
-//            System.out.println("More than half of the lines in " + f1.filename + " are copied.");
-        }
-        if (fileByLineCounter > f2.newLines.size() / 2) {
-//            System.out.println("More than half of the lines in " + f2.filename + " are copied.");
-        }
     }
 
     public void substringCheck(collusionFile f1, collusionFile f2) {
@@ -637,21 +608,11 @@ public class collisionChecker {
                 }
             }
         }
-
         startIndex1 = endIndex1 - substringLength;
         startIndex2 = endIndex2 - substringLength;
-
         double PCofF1 = substringLength / (double) f1.fileAsString.length();
         double PCofF2 = substringLength / (double) f2.fileAsString.length();
-
         substringScore = (PCofF1 + PCofF2)/2;
-
-        if (PCofF1 > 20) {
-//            System.out.println("Long subsequence found in file " + f1.filename + " at line " + getLineNumber(f1, startIndex1) + " (" + String.format("%.1f", PCofF1) + "% of file length) and in file " + f2.filename + " at line " + getLineNumber(f2, startIndex2) + " (" + String.format("%.1f", PCofF2) + "% of file length)");
-        }
-        if (PCofF2 > 20) {
-//            System.out.println("Long subsequence found in file " + f1.filename + " at line " + getLineNumber(f1, startIndex1) + " (" + String.format("%.1f", PCofF1) + "% of file length) and in file " + f2.filename + " at line " + getLineNumber(f2, startIndex2) + " (" + String.format("%.1f", PCofF2) + "% of file length)");
-        }
     }
 
     public void outputCheck(collusionFile f1, collusionFile f2) {
@@ -746,7 +707,7 @@ public class collisionChecker {
                 blankLines++;
 //                System.out.println("Blank Lines: " + blankLines + " (char before: " + fas1.charAt(i - 1) + ", " + (i - 1) + ")");
             }
-            if (j > 1) {
+            if (j > 2) {
                 over2BlankLinesFlag++;
                 over2BlankLinesIndices.add(i);
             }

@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.*;
 
 //asks user for filepath
@@ -37,7 +36,7 @@ public class project {
         fileLoader fl = new fileLoader(directory, givenCode);
 
         for (collusionFile cf : fl.collusionFiles) {
-            collisionChecker cc = new collisionChecker(cf);
+            collusionChecker cc = new collusionChecker(cf);
         }
 //        System.out.println("\nEnd Of Whitespace Check\n////////////////////////////////////////////////////////////");
 
@@ -46,7 +45,6 @@ public class project {
         for (collusionFile cf : fl.collusionFiles) {
             if (fl.collusionFiles.indexOf(cf) + 1 < fl.collusionFiles.size()) {
                 for (int i = fl.collusionFiles.indexOf(cf) + 1; i < fl.collusionFiles.size(); i++) {
-//                    System.out.println("\nComparison for " + cf.filename + " and " + fl.collusionFiles.get(i).filename);
                     scoreCalculator sc = new scoreCalculator(cf, fl.collusionFiles.get(i));
                     results.add(sc);
                 }
@@ -124,30 +122,54 @@ public class project {
                 ArrayList<ArrayList<?>> rankedList = new ArrayList<>();
 
                 //add names and values
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Whitespace Usage Flags (multiple blank lines)", sc.blankLineResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Whitespace Usage Flags (spaces at start of line)", sc.startSpacesResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Whitespace Usage Flags (spaces at end of line)", sc.endSpacesResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Formatting Flags (brackets used at start of line infrequently)", sc.startBracketsResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Formatting Flags (brackets used at end of line infrequently)", sc.endBracketResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Inconsistent Formatting Flags (brackets used on their own line infrequently)", sc.ownBracketResultsScore)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("File Overall Similarity as Strings", sc.fasSimilarity)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Comment Overall Similarity as Strings", sc.commentSimilarity)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Similarity between Tokenised Files", sc.tokenSimilarity)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Similarity between Tokenised Comments", sc.commentTokenSimilarity)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Similarity Between Terminal Output", sc.outputSimilarity)));
-                rankedList.add(new ArrayList<>(
-                        Arrays.asList("Longest Similar Substring as % of File Length", sc.substringSimilarity)));
+                if (sc.blankLineResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Whitespace Usage Flags (multiple blank lines)", sc.blankLineResultsScore)));
+                }
+                if (sc.startSpacesResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Whitespace Usage Flags (spaces at start of line)", sc.startSpacesResultsScore)));
+                }
+                if (sc.endSpacesResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Whitespace Usage Flags (spaces at end of line)", sc.endSpacesResultsScore)));
+                }
+                if (sc.startBracketsResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Formatting Flags (brackets used at start of line infrequently)", sc.startBracketsResultsScore)));
+                }
+                if (sc.endBracketResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Formatting Flags (brackets used at end of line infrequently)", sc.endBracketResultsScore)));
+                }
+                if (sc.ownBracketResultsScore > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Inconsistent Formatting Flags (brackets used on their own line infrequently)", sc.ownBracketResultsScore)));
+                }
+                if (sc.fasSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("File Overall Similarity as Strings", sc.fasSimilarity)));
+                }
+                if (sc.commentSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Comment Overall Similarity as Strings", sc.commentSimilarity)));
+                }
+                if (sc.tokenSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Similarity between Tokenised Files", sc.tokenSimilarity)));
+                }
+                if (sc.commentTokenSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Similarity between Tokenised Comments", sc.commentTokenSimilarity)));
+                }
+                if (sc.outputSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Similarity Between Terminal Output", sc.outputSimilarity)));
+                }
+                if (sc.substringSimilarity > 0) {
+                    rankedList.add(new ArrayList<>(
+                            Arrays.asList("Longest Similar Substring as % of File Length", sc.substringSimilarity)));
+                }
 
 //                Collections.sort(rankedList, Collections.reverseOrder());
                 Collections.sort(rankedList, new Comparator<ArrayList<?>>() {
@@ -184,11 +206,11 @@ public class project {
                 if (sc.getIndices().get(0).get(0).size() > 0) {
                     while (blankLinesCounter < sc.getIndices().get(0).get(0).size() && sc.getIndices().get(0).get(0).get(blankLinesCounter).size() > 0 && sc.getIndices().get(0).get(1).get(blankLinesCounter).size() > 0) {
                         if (!blankLinesIndices1.contains(sc.getLineNumber(sc.f1, sc.getIndices().get(0).get(0).get(blankLinesCounter).get(0)))) {
-//                                System.out.println(sc.getIndices().get(0).get(0).get(blankLinesCounter).get(0));
+//                                System.out.println(sc.f1.filename + "-" + sc.getIndices().get(0).get(0).get(blankLinesCounter).get(0));
                             blankLinesIndices1.add(sc.getLineNumber(sc.f1, sc.getIndices().get(0).get(0).get(blankLinesCounter).get(0)));
                         }
                         if (!blankLinesIndices2.contains(sc.getLineNumber(sc.f2, sc.getIndices().get(0).get(1).get(blankLinesCounter).get(0)))) {
-//                                System.out.println(sc.getIndices().get(0).get(1).get(blankLinesCounter).get(0));
+//                                System.out.println(sc.f2.filename + "-" + sc.getIndices().get(0).get(1).get(blankLinesCounter).get(0));
                             blankLinesIndices2.add(sc.getLineNumber(sc.f2, sc.getIndices().get(0).get(1).get(blankLinesCounter).get(0)));
                         }
                         blankLinesCounter++;
@@ -248,7 +270,7 @@ public class project {
                         endLinesCounter++;
                     }
 
-                    writer.write("\nInconsistent Whitespace Usage (incorrect indentation at end of lines) - Located between lines " + endLinesIndices1.get(0) + "-" + endLinesIndices1.get(endLinesIndices1.size() - 1));
+                    writer.write("\nInconsistent Whitespace Usage (excess whitespace at end of lines) - Located between lines " + endLinesIndices1.get(0) + "-" + endLinesIndices1.get(endLinesIndices1.size() - 1));
 //                        for (int j : endLinesIndices1) {
 //                            writer.write(j + ", ");
 //                        }
